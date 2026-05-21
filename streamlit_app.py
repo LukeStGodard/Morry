@@ -58,10 +58,20 @@ if uploaded_file is not None and role != "Select Role":
                 visual_instructions = ""
                 role_specific_sop = ""
                 
-                # 2. Dynamic Visual SOP Attachment Logic
+                # 2. Dynamic Visual SOP & Enhanced Prompt Logic
                 if role in ["Server", "DRC"]:
                     role_specific_sop = f"""
-                    If the timeline dictates a Coffee Station, you must blend the logistical details from the packet (Linen, Room location, Table sizes) with this exact Master SOP data:
+                    ***SERVER & DRC SPECIFIC EXTRACTION RULES:***
+                    You must extract and organize the output into these exact sections:
+                    
+                    1. ⏱️ TIMELINE: Provide a clean, chronological timeline of the shift.
+                    2. 🪑 SET UP & LINENS: 
+                       - List exactly how many tables and what sizes are being set up.
+                       - Specify the exact linens going to those tables.
+                       - **CRITICAL:** Explicitly state if the linens are RENTED or RMCE in-house.
+                       - Add this exact note at the bottom of this section: "📍 *Please refer to the floor plan for exact table and station placement.*"
+                    3. 🍽️ FOOD MENU: Clearly break down what the Hors d'oeuvres are and what the Dinner service consists of.
+                    4. ☕ COFFEE STATION: If the packet dictates a Coffee Station, blend the logistical details from the packet with this Master SOP:
                     {COFFEE_SOP}
                     """
                     
@@ -94,7 +104,7 @@ if uploaded_file is not None and role != "Select Role":
                 
                 IF THE ROLE IS BARTENDER:
                 - Focus heavily on bar setups, specific glass counts, liquor/beer/wine inventory, bar placement timelines, and ice availability.
-                - DO NOT include or mention the Coffee Station under any circumstances.
+                - DO NOT include or mention the Coffee Station or Food Menu under any circumstances.
                 """
                 
                 api_contents.append(f"Generate the concise operational breakdown for a {role}.")
@@ -113,4 +123,3 @@ if uploaded_file is not None and role != "Select Role":
                 
             except Exception as e:
                 st.error(f"An operational error occurred during data analysis: {e}")
-                
