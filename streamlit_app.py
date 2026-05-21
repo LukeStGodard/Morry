@@ -116,13 +116,23 @@ if uploaded_file is not None and role != "Select Role":
                 
                 st.success("Audit Complete!")
                 
-                # 4. Render the physical image FIRST
-                if role in ["Server", "DRC"] and "COFFEE STATION" in response.text.upper():
+                # 4. Smart Rendering: Inject image exactly under the Coffee title
+                if role in ["Server", "DRC"] and "☕ COFFEE STATION" in response.text:
+                    # Slice the AI's text exactly at the coffee header
+                    parts = response.text.split("☕ COFFEE STATION", 1)
+                    
+                    # Print everything up to and including the title
+                    st.markdown(parts[0] + "☕ COFFEE STATION")
+                    
+                    # Drop the image right below the title
                     if os.path.exists(coffee_img_path):
                         st.image(coffee_img_path, caption="Visual Reference: Pristine Coffee Station Layout", use_container_width=True)
-                
-                # 5. Render the text UNDERNEATH the image
-                st.markdown(response.text)
+                        
+                    # Print the actual SOP instructions below the image
+                    st.markdown(parts[1])
+                else:
+                    # If it's a bartender or no coffee station is mentioned, print normally
+                    st.markdown(response.text)
                 
             except Exception as e:
                 st.error(f"An operational error occurred during data analysis: {e}")
