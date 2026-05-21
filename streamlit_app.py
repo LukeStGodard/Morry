@@ -65,14 +65,15 @@ if uploaded_file is not None and role != "Select Role":
                     ***SERVER & DRC SPECIFIC EXTRACTION RULES:***
                     - DO NOT include general beverage/product inventory counts, ice logistics, or ANY Bar setups (e.g., Single Bars). Focus ONLY on the following sections:
                     
-                    1. ⏱️ TIMELINE: Provide a clean, chronological timeline of the shift.
+                    1. ⏱️ TIMELINE: Provide a clean, chronological timeline. **Bold** the specific times for visual impact.
                     2. 🪑 SET UP & LINENS: 
-                       - **FORMATTING RULE:** Use a bulleted list grouped by room/location. DO NOT use a Markdown table for this section.
+                       - **FORMATTING RULE:** Group by room/location. Use a Markdown Subheader (### Room Name) so the location text is large and distinct. 
+                       - Under each subheader, use a bulleted list. **Bold** the table sizes and linen colors so they pop on screen.
                        - List exactly how many guest tables, station tables, and high tops (excluding bar setups) are being set up.
                        - Specify the exact linens going to those tables.
-                       - **CRITICAL:** Explicitly state if the linens are RENTED or RMCE in-house.
+                       - **CRITICAL:** Explicitly state if the linens are **RENTED** or **RMCE in-house** (bold this status).
                        - Add this exact note at the bottom of this section: "📍 *Please refer to the floor plan for exact table and station placement.*"
-                    3. 🍽️ FOOD MENU: Clearly break down what the Hors d'oeuvres are and what the Dinner service consists of.
+                    3. 🍽️ FOOD MENU: Clearly break down what the Hors d'oeuvres are and what the Dinner service consists of. Use bolding for the dish names.
                     4. ☕ COFFEE STATION: If the packet dictates a Coffee Station, blend the logistical details from the packet with this Master SOP:
                     {COFFEE_SOP}
                     """
@@ -90,8 +91,10 @@ if uploaded_file is not None and role != "Select Role":
                 Analyze the provided Party Pack PDF and provide role-specific logistics for the role: {role}.
                 
                 CRITICAL INSTRUCTIONS:
-                - NO PARAGRAPHS. Use clean bullet points. 
-                - USE TABLES ONLY FOR INVENTORY COUNTS (like Bartender drink lists).
+                - NO PARAGRAPHS. 
+                - CREATE VISUAL FLAIR: Heavily utilize **bold text** to make critical information (times, counts, statuses, items) stand out against normal text.
+                - USE SUBHEADERS: Use Markdown headers (## or ###) to create clear, visually distinct sections.
+                - USE TABLES ONLY FOR INVENTORY COUNTS (like Bartender drink lists). 
                 - Use emojis for headers to maintain mobile scannability.
                 - Keep descriptions highly brief.
                 
