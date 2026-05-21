@@ -115,12 +115,14 @@ if uploaded_file is not None and role != "Select Role":
                 )
                 
                 st.success("Audit Complete!")
-                st.markdown(response.text)
                 
-                # 4. Render the physical image to the screen for the Server/DRC
+                # 4. Render the physical image FIRST
                 if role in ["Server", "DRC"] and "COFFEE STATION" in response.text.upper():
                     if os.path.exists(coffee_img_path):
                         st.image(coffee_img_path, caption="Visual Reference: Pristine Coffee Station Layout", use_container_width=True)
+                
+                # 5. Render the text UNDERNEATH the image
+                st.markdown(response.text)
                 
             except Exception as e:
                 st.error(f"An operational error occurred during data analysis: {e}")
