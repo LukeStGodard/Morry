@@ -57,12 +57,13 @@ if uploaded_file is not None and role != "Select Role":
                 api_contents = [img_file]
                 visual_instructions = ""
                 role_specific_sop = ""
+                coffee_img_path = "Coffee_Station_SOP.jpg"
                 
                 # 2. Dynamic Visual SOP & Enhanced Prompt Logic
                 if role in ["Server", "DRC"]:
                     role_specific_sop = f"""
                     ***SERVER & DRC SPECIFIC EXTRACTION RULES:***
-                    You must extract and organize the output into these exact sections:
+                    - DO NOT include general beverage/product inventory counts or ice logistics. Focus ONLY on the following sections:
                     
                     1. ⏱️ TIMELINE: Provide a clean, chronological timeline of the shift.
                     2. 🪑 SET UP & LINENS: 
@@ -74,9 +75,6 @@ if uploaded_file is not None and role != "Select Role":
                     4. ☕ COFFEE STATION: If the packet dictates a Coffee Station, blend the logistical details from the packet with this Master SOP:
                     {COFFEE_SOP}
                     """
-                    
-                    # Look directly in the main folder for the image
-                    coffee_img_path = "Coffee_Station_SOP.jpg"
                         
                     if os.path.exists(coffee_img_path):
                         coffee_visual = client.files.upload(file=coffee_img_path)
@@ -95,14 +93,12 @@ if uploaded_file is not None and role != "Select Role":
                 - Use emojis for headers to maintain mobile scannability.
                 - Keep descriptions highly brief.
                 
-                REQUIRED EXTRACTS FOR ALL ROLES:
-                1. 📦 PRODUCT INVENTORY COUNT: Look for all beverage, food, or operational inventory line items and create a clean Markdown table displaying the item name and exact quantity provided.
-                2. ❄️ ICE LOGISTICS: Audit the pack to confirm if the ice requirements dictate "Bagged Ice" or "Ice in a Caddy". Explicitly state the container type and location specified.
-                
                 {role_specific_sop}
                 {visual_instructions}
                 
                 IF THE ROLE IS BARTENDER:
+                - 📦 PRODUCT INVENTORY COUNT: Look for all beverage, food, or operational inventory line items and create a clean Markdown table displaying the item name and exact quantity provided.
+                - ❄️ ICE LOGISTICS: Audit the pack to confirm if the ice requirements dictate "Bagged Ice" or "Ice in a Caddy". Explicitly state the container type and location specified.
                 - Focus heavily on bar setups, specific glass counts, liquor/beer/wine inventory, bar placement timelines, and ice availability.
                 - DO NOT include or mention the Coffee Station or Food Menu under any circumstances.
                 """
@@ -119,7 +115,24 @@ if uploaded_file is not None and role != "Select Role":
                 )
                 
                 st.success("Audit Complete!")
-                st.markdown(response.text)
+                
+                # 4. Smart Rendering: Inject image exactly under the Coffee title
+                if role in ["Server", "DRC"] and "☕ COFFEE STATION" in response.text:
+                    # Slice the AI's text exactly at the coffee header
+                    parts = response.text.split("☕ COFFEE STATION", 1)
+                    
+                    # Print everything up to and including the title
+                    st.markdown(parts[0] + "☕ COFFEE STATION")
+                    
+                    # Drop the image right below the title
+                    if os.path.exists(coffee_img_path):
+                        st.image(coffee_img_path, caption="Visual Reference: Pristine Coffee Station Layout", use_container_width=True)
+                        
+                    # Print the actual SOP instructions below the image
+                    st.markdown(parts[1])
+                else:
+                    # If it's a bartender or no coffee station is mentioned, print normally
+                    st.markdown(response.text)
                 
             except Exception as e:
                 st.error(f"An operational error occurred during data analysis: {e}")
