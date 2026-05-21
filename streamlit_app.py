@@ -63,11 +63,12 @@ if uploaded_file is not None and role != "Select Role":
                 if role in ["Server", "DRC"]:
                     role_specific_sop = f"""
                     ***SERVER & DRC SPECIFIC EXTRACTION RULES:***
-                    - DO NOT include general beverage/product inventory counts or ice logistics. Focus ONLY on the following sections:
+                    - DO NOT include general beverage/product inventory counts, ice logistics, or ANY Bar setups (e.g., Single Bars). Focus ONLY on the following sections:
                     
                     1. ⏱️ TIMELINE: Provide a clean, chronological timeline of the shift.
                     2. 🪑 SET UP & LINENS: 
-                       - List exactly how many tables and what sizes are being set up.
+                       - **FORMATTING RULE:** Use a bulleted list grouped by room/location. DO NOT use a Markdown table for this section.
+                       - List exactly how many guest tables, station tables, and high tops (excluding bar setups) are being set up.
                        - Specify the exact linens going to those tables.
                        - **CRITICAL:** Explicitly state if the linens are RENTED or RMCE in-house.
                        - Add this exact note at the bottom of this section: "📍 *Please refer to the floor plan for exact table and station placement.*"
@@ -89,7 +90,8 @@ if uploaded_file is not None and role != "Select Role":
                 Analyze the provided Party Pack PDF and provide role-specific logistics for the role: {role}.
                 
                 CRITICAL INSTRUCTIONS:
-                - NO PARAGRAPHS. Use clean bullet points and Markdown tables.
+                - NO PARAGRAPHS. Use clean bullet points. 
+                - USE TABLES ONLY FOR INVENTORY COUNTS (like Bartender drink lists).
                 - Use emojis for headers to maintain mobile scannability.
                 - Keep descriptions highly brief.
                 
@@ -118,20 +120,12 @@ if uploaded_file is not None and role != "Select Role":
                 
                 # 4. Smart Rendering: Inject image exactly under the Coffee title
                 if role in ["Server", "DRC"] and "☕ COFFEE STATION" in response.text:
-                    # Slice the AI's text exactly at the coffee header
                     parts = response.text.split("☕ COFFEE STATION", 1)
-                    
-                    # Print everything up to and including the title
                     st.markdown(parts[0] + "☕ COFFEE STATION")
-                    
-                    # Drop the image right below the title
                     if os.path.exists(coffee_img_path):
                         st.image(coffee_img_path, caption="Visual Reference: Pristine Coffee Station Layout", use_container_width=True)
-                        
-                    # Print the actual SOP instructions below the image
                     st.markdown(parts[1])
                 else:
-                    # If it's a bartender or no coffee station is mentioned, print normally
                     st.markdown(response.text)
                 
             except Exception as e:
