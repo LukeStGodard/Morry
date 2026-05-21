@@ -71,4 +71,56 @@ if uploaded_file is not None and role != "Select Role":
                        - Specify the exact linens going to those tables.
                        - **CRITICAL:** Explicitly state if the linens are RENTED or RMCE in-house.
                        - Add this exact note at the bottom of this section: "📍 *Please refer to the floor plan for exact table and station placement.*"
-                    3. 🍽️ FOOD MENU: Clearly break down what the Hors d'oeuvres are and what the Dinner service consists
+                    3. 🍽️ FOOD MENU: Clearly break down what the Hors d'oeuvres are and what the Dinner service consists of.
+                    4. ☕ COFFEE STATION: If the packet dictates a Coffee Station, blend the logistical details from the packet with this Master SOP:
+                    {COFFEE_SOP}
+                    """
+                        
+                    if os.path.exists(coffee_img_path):
+                        coffee_visual = client.files.upload(file=coffee_img_path)
+                        api_contents.append(coffee_visual)
+                        visual_instructions = """
+                        - VISUAL SOP CROSS-CHECK: You have been provided an image reference of a pristine coffee station setup. Cross-reference the timeline and item counts in the Party Pack with this layout blueprint to verify equipment alignment.
+                        """
+                
+                # 3. Construct System Prompt
+                system_instruction = f"""
+                You are an Elite Russell Morin Event Operations Agent. 
+                Analyze the provided Party Pack PDF and provide role-specific logistics for the role: {role}.
+                
+                CRITICAL INSTRUCTIONS:
+                - NO PARAGRAPHS. Use clean bullet points and Markdown tables.
+                - Use emojis for headers to maintain mobile scannability.
+                - Keep descriptions highly brief.
+                
+                {role_specific_sop}
+                {visual_instructions}
+                
+                IF THE ROLE IS BARTENDER:
+                - 📦 PRODUCT INVENTORY COUNT: Look for all beverage, food, or operational inventory line items and create a clean Markdown table displaying the item name and exact quantity provided.
+                - ❄️ ICE LOGISTICS: Audit the pack to confirm if the ice requirements dictate "Bagged Ice" or "Ice in a Caddy". Explicitly state the container type and location specified.
+                - Focus heavily on bar setups, specific glass counts, liquor/beer/wine inventory, bar placement timelines, and ice availability.
+                - DO NOT include or mention the Coffee Station or Food Menu under any circumstances.
+                """
+                
+                api_contents.append(f"Generate the concise operational breakdown for a {role}.")
+                
+                response = client.models.generate_content(
+                    model="gemini-3.5-flash",
+                    contents=api_contents,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_instruction,
+                        temperature=0.2
+                    )
+                )
+                
+                st.success("Audit Complete!")
+                st.markdown(response.text)
+                
+                # 4. Render the physical image to the screen for the Server/DRC
+                if role in ["Server", "DRC"] and "COFFEE STATION" in response.text.upper():
+                    if os.path.exists(coffee_img_path):
+                        st.image(coffee_img_path, caption="Visual Reference: Pristine Coffee Station Layout", use_container_width=True)
+                
+            except Exception as e:
+                st.error(f"An operational error occurred during data analysis: {e}")
